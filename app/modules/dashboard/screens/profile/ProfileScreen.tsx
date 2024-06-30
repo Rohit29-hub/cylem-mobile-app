@@ -66,7 +66,12 @@ const ProfileScreen = () => {
         <View className='w-full mb-1'>
           <Text className="text-black dark:text-gray-100">Address Details</Text>
         </View>
-        <InputField value={user?.user_address_detail?.house_number + " " + user?.user_address_detail?.adress_line_1 + " " + user?.user_address_detail?.pincode} title='Address' uppercase={true} />
+        <InputField value={
+            user?.user_address_detail?.house_number + " " + 
+            user?.user_address_detail?.adress_line_1 + " " + 
+            user?.user_address_detail?.pincode + " " + 
+            user?.user_address_detail?.state
+          } title='Address' uppercase={true} />
       </View>
     </View>
   )

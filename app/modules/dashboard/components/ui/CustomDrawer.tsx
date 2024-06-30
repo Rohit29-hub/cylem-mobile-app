@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { DrawerContentScrollView, DrawerItem, DrawerItemList } from '@react-navigation/drawer';
 import { Alert, Text, View } from 'react-native'
 import RazorpayButton from '@app/modules/payment/Razorpay'
@@ -13,8 +13,8 @@ import { RootState } from '@app/redux/store';
 const checkThisMonthUserSubscription = (sub_pay_date: string): boolean => {
     const current_date = new Date();
     const user_date = new Date(sub_pay_date);
-
-    return current_date.getMonth() + 1 <= user_date.getMonth() + 1;
+    const month =  (current_date.getMonth() + 1 ) - (user_date.getMonth() + 1);
+    return month !== 0;
 }
 
 const findPreviousNotTakeSubscriptionAmount = (sub_pay_date: string, subscription_id: number) => {
@@ -31,7 +31,7 @@ const findPreviousNotTakeSubscriptionAmount = (sub_pay_date: string, subscriptio
 }
 
 const CustomDrawer = (props: any) => {
-
+    const [isUserSubscribedThisMonth, setIsUserSubscribedThisMonth] = useState(true);
     const [subscriptionAmount, setSubscriptionAmount] = React.useState(0);
     const user = useSelector((state: RootState) => state.user.user);
     const dispatch = useDispatch();
@@ -44,7 +44,10 @@ const CustomDrawer = (props: any) => {
     }
 
     const paymentFailed = (errMessage: string) => {
-        Alert.alert("Payment failed", errMessage);
+        Alert.alert(
+            "Payment failed",
+            errMessage.replace('_', ' ')
+        );
     }
 
 
@@ -54,8 +57,8 @@ const CustomDrawer = (props: any) => {
         props.navigation.closeDrawer();
     }
 
-
-    React.useEffect(() => {
+    // find total subscription amount
+    useEffect(() => {
         if (bucket_details) {
             const amount = findPreviousNotTakeSubscriptionAmount(
                 bucket_details?.sub_pay_date,
@@ -63,7 +66,16 @@ const CustomDrawer = (props: any) => {
             );
             setSubscriptionAmount(amount);
         }
-    }, [bucket_details]);
+    }, [bucket_details,new Date().getMonth()]);
+
+    // check user subscribed this month or not 
+    useEffect(() => {
+        if (bucket_details) {
+            const isPaidMonth = checkThisMonthUserSubscription(bucket_details?.sub_pay_date);
+            if (isPaidMonth) setIsUserSubscribedThisMonth(false);
+            else setIsUserSubscribedThisMonth(true);
+        }
+    }, [new Date().getMonth(), bucket_details])
 
     return (
         <View className="p-2 w-full h-full flex-col bg-white dark:bg-app-dark-theme-0 items-center justify-between relative" {...props}>
@@ -80,29 +92,26 @@ const CustomDrawer = (props: any) => {
                     </View>
                 </View>
                 <View className="mt-2">
-                    <DrawerContentScrollView>
-                        <DrawerItemList androidPressColor={"#fff"} {...props}/>
+                        <DrawerItemList androidPressColor={"#fff"} {...props} />
                         <DrawerItem labelStyle={{
                             color: "#575757"
                         }} label={"About us"} onPress={() => handleNavigation("AboutusScreen")} />
                         <DrawerItem labelStyle={{
                             color: "#575757"
-                        }}  label={"Privacy Policy"} onPress={() => handleNavigation("PrivacyPolicyScreen")} />
+                        }} label={"Privacy Policy"} onPress={() => handleNavigation("PrivacyPolicyScreen")} />
                         <Logout pressColor='red' style={'px-5 mt-5 font-sm font-medium font-poppins-medium text-[#575757]'} />
-                    </DrawerContentScrollView>
-
                 </View>
             </View>
             <View className="w-full">
-                {bucket_details &&
-                    !checkThisMonthUserSubscription(bucket_details?.sub_pay_date) ? (
-                    <RazorpayButton
-                        buttonTitle={"Renew Subscription"}
-                        subscription_amount={subscriptionAmount}
-                        success_cb={paymentSuccess}
-                        failure_cb={paymentFailed}
-                    />
-                ) : ("")
+                {
+                    !isUserSubscribedThisMonth ? (
+                        <RazorpayButton
+                            buttonTitle={"Renew Subscription"}
+                            subscription_amount={subscriptionAmount}
+                            success_cb={paymentSuccess}
+                            failure_cb={paymentFailed}
+                        />
+                    ) : (<Text>Hello world</Text>)
                 }
             </View>
         </View>

@@ -1,13 +1,12 @@
-import React, { useEffect } from 'react'
+import React from 'react'
 import { Text, View, StatusBar, FlatList, ActivityIndicator } from 'react-native'
 import DashboardHeader from '../../components/ui/DashboardHeader'
 import { Plus } from 'lucide-react-native'
 import { IsDark } from '@app/utils/helper'
-import { useDispatch, useSelector } from "react-redux"
 import { SubscriptionScreenNavigationProp } from '@app/types/navigationTypes'
 import { RootState } from '@app/redux/store'
-import { getPaymentDetails } from '@app/redux/slices/dashboardSlice'
 import { paymentType } from '@app/types/dashboard'
+import { useSelector } from 'react-redux'
 
 function findMyBucketAmount(subscription_id: number) {
     switch (subscription_id) {
@@ -19,16 +18,7 @@ function findMyBucketAmount(subscription_id: number) {
 }
 const SubscriptionScreen = ({ navigation }: { navigation: SubscriptionScreenNavigationProp }) => {
     const { bucket_details, payment_details } = useSelector((slices: RootState) => slices.dashboard_slice.payment_details);
-    const dispatch = useDispatch();
     const darkTheme = IsDark();
-
-    useEffect(() => {
-        const getSubscriptionData = () => {
-            dispatch(getPaymentDetails());
-        };
-        getSubscriptionData();
-    }, []);
-
     return (
         <View className="w-full h-full bg-white dark:bg-app-dark-theme-0">
             <StatusBar backgroundColor={darkTheme ? '#111111' : '#fff'} barStyle={darkTheme ? 'light-content' : 'dark-content'} />

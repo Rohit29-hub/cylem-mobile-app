@@ -69,7 +69,7 @@ export const paymentHandler = (
             });
         })
         .catch(error => {
-          failed_callback('You cencel the payment !');
+          failed_callback(error.error.reason);
         });
     })
     .catch(error => {

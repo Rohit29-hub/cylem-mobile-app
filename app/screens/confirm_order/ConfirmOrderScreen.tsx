@@ -22,7 +22,10 @@ const ConfirmOrderScreen = ({navigation,route}: {
     }
 
     const paymentFailed = (errMessage: string) => {
-        Alert.alert("Payment Failed",errMessage);
+        Alert.alert(
+            "Payment Failed",
+            errMessage.replace('_',' ')
+        );
     }
 
     const renderCardSvg = () => {

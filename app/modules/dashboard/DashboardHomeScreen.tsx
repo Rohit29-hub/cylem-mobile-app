@@ -3,7 +3,7 @@ import { Alert, Image, StatusBar, Text, View, TouchableOpacity, ActivityIndicato
 import DashboardHeader from './components/ui/DashboardHeader'
 import { DashboardHomeScreenNavigationProp, DashboardScreenNavigationProp } from '@app/types/navigationTypes'
 import { useDispatch, useSelector } from 'react-redux'
-import { getBooksData, getCollectionDetails } from '@app/redux/slices/dashboardSlice'
+import { getBooksData, getCollectionDetails, getPaymentDetails } from '@app/redux/slices/dashboardSlice'
 import { IsDark } from '@app/utils/helper'
 import { useNavigation } from '@react-navigation/native'
 import { RootState } from '@app/redux/store'
@@ -34,6 +34,7 @@ const DashboardHomeScreen = ({ navigation }: { navigation: DashboardHomeScreenNa
             if (isMounted) {
                 dispatch(getCollectionDetails());
                 dispatch(getBooksData());
+                dispatch(getPaymentDetails());
             }
         };
         fetchData();
